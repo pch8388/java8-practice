@@ -5,6 +5,8 @@ import static java.util.stream.Collectors.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Ex5Main {
 	public static void main(String[] args) {
@@ -77,5 +79,27 @@ public class Ex5Main {
 		transactions.stream()
 					.min(Comparator.comparing(Transaction::getValue))
 					.ifPresent(System.out::println);
+
+
+
+		System.out.println("============================ IntStream ============================");
+
+		IntStream evenValue = IntStream.rangeClosed(1, 100)
+									   .filter(i -> i % 2 == 0);
+		System.out.println("rangeClosed is " + evenValue.count());
+
+		IntStream evenValue2 = IntStream.range(1, 100)
+				   .filter(i -> i % 2 == 0);
+		System.out.println("range is " + evenValue2.count());
+
+		System.out.println("============================ pythagoreanTriples ============================");
+		Stream<int[]> pythagoreanTriples = IntStream.rangeClosed(1, 100).boxed()
+													.flatMap(a ->
+																IntStream.rangeClosed(a, 100)
+																		 .filter(b -> Math.sqrt(a * a + b * b) % 1 == 0)
+																		 .mapToObj(b -> new int[]{a, b, (int) Math.sqrt(a * a + b * b)})
+															);
+		pythagoreanTriples.limit(5)
+						  .forEach(t -> System.out.println(t[0] + ", " + t[1] + ", " + t[2]));
 	}
 }
