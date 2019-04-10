@@ -29,7 +29,7 @@ public class Ex5Main {
 											.filter(t -> t.getYear() == 2011)
 											.sorted(Comparator.comparing(Transaction::getValue))
 											.collect(toList());
-		ex1.stream().forEach(System.out::println);
+		ex1.forEach(System.out::println);
 
 		System.out.println("============================ ex 2 ============================");
 		transactions.stream()
@@ -39,7 +39,7 @@ public class Ex5Main {
 
 		System.out.println("============================ ex 3 ============================");
 		transactions.stream()
-					.map(m -> m.getTrader())
+					.map(Transaction::getTrader)
 					.filter(t -> t.getCity().equals("Cambridge"))
 					.distinct()
 					.sorted(Comparator.comparing(Trader::getName))
@@ -56,15 +56,17 @@ public class Ex5Main {
 
 		System.out.println("============================ ex 5 ============================");
 		transactions.stream()
-					.filter(t -> t.getTrader().getCity() == "Milan")
+					.filter(t -> "Milan".equals(t.getTrader().getCity()))
 					.findAny()
 					.ifPresent(i -> System.out.println("Milan Trader : " + i));
 
-		transactions.stream()
-					.anyMatch(t -> t.getTrader().getCity().equals("Milan"));
+        boolean milan = transactions.stream()
+                .anyMatch(t -> t.getTrader().getCity().equals("Milan"));
+
+        System.out.println("milan : " + milan);
 
 
-		System.out.println("============================ ex 6 ============================");
+        System.out.println("============================ ex 6 ============================");
 		transactions.stream()
 					.filter(t -> "Cambridge".equals(t.getTrader().getCity()))
 					.map(Transaction::getValue)
@@ -101,5 +103,26 @@ public class Ex5Main {
 															);
 		pythagoreanTriples.limit(5)
 						  .forEach(t -> System.out.println(t[0] + ", " + t[1] + ", " + t[2]));
+
+		IntStream.rangeClosed(1, 100).boxed()
+				 .flatMap(a ->
+						 IntStream.rangeClosed(a, 100)
+						 		  .mapToObj(b -> new double[]{a, b, Math.sqrt(a * a + b * b)})
+				 ).filter(t -> t[2] % 1 == 0)
+				.limit(5)
+				.forEach(t -> System.out.println(t[0] + ", " + t[1] + ", " + t[2]));
+
+		System.out.println("============================ ex 5.7 ============================");
+		Stream<String> stream = Stream.of("Java 8", "Lambdas ", "In ", "Action");
+		stream.map(String::toUpperCase).forEach(System.out::println);
+
+		System.out.println("============================ iterate ============================");
+		Stream.iterate(0, n -> n + 2)
+				.limit(10)
+				.forEach(System.out::println);
+
+		Stream.iterate(new int[]{0,1}, i -> new int[]{i[1], i[0]+i[1]})
+				.limit(20)
+				.forEach(t -> System.out.println("(" + t[0] + ", " + t[1] + ")"));
 	}
 }
