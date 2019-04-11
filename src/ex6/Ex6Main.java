@@ -1,5 +1,6 @@
 package ex6;
 
+import static java.util.Comparator.*;
 import static java.util.stream.Collectors.*;
 
 import java.util.Arrays;
@@ -25,5 +26,13 @@ public class Ex6Main {
         long howManyDishes = menu.stream().collect(counting());
         System.out.println(howManyDishes);
 
+        System.out.println("============================ maxBy ============================");
+        menu.stream().collect(maxBy(comparingInt(Dish::getCalories))).ifPresent(System.out::println);
+
+        System.out.println("============================ summingInt ============================");
+        System.out.println(menu.stream().collect(summingInt(Dish::getCalories)));
+
+        System.out.println("============================ summarizingInt ============================");
+        System.out.println(menu.stream().collect(summarizingInt(Dish::getCalories)));
 	}
 }
