@@ -3,10 +3,7 @@ package ex6;
 import static java.util.Comparator.*;
 import static java.util.stream.Collectors.*;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import ex1.Dish;
 
@@ -73,6 +70,49 @@ public class Ex6Main {
                           groupingBy(Ex6Main::caloricLevelGroupFunction))
                 );
         System.out.println(dishesByTypeCaloricLevel);
+
+        Map<Dish.Type, Long> typesCount = menu.stream().collect(groupingBy(Dish::getType, counting()));
+        System.out.println(typesCount);
+
+        Map<Dish.Type, Optional<Dish>> mostCaloricByType =
+                menu.stream()
+                    .collect(groupingBy(Dish::getType, maxBy(comparingInt(Dish::getCalories))));
+        System.out.println(mostCaloricByType);
+
+        Map<Dish.Type, Dish> mostColoricByType2 =
+                menu.stream()
+                    .collect(groupingBy(Dish::getType,
+                            collectingAndThen(
+                                    maxBy(comparingInt(Dish::getCalories)), Optional::get)));
+        System.out.println(mostColoricByType2);
+
+        Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType =
+                menu.stream().collect(
+                        groupingBy(Dish::getType, mapping(dish -> {
+                                if (dish.getCalories() <= 400) {
+                                        return CaloricLevel.DIET;
+                                } else if (dish.getCalories() <= 700) {
+                                        return CaloricLevel.NORMAL;
+                                } else {
+                                        return CaloricLevel.FAT;
+                                }
+                        },
+                 toSet())));
+        System.out.println(caloricLevelsByType);
+
+        Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType2 =
+                menu.stream().collect(
+                        groupingBy(Dish::getType, mapping(dish -> {
+                                if (dish.getCalories() <= 400) {
+                                        return CaloricLevel.DIET;
+                                } else if (dish.getCalories() <= 700) {
+                                        return CaloricLevel.NORMAL;
+                                } else {
+                                        return CaloricLevel.FAT;
+                                }
+                        },
+                  toCollection(HashSet::new))));
+        System.out.println(caloricLevelsByType2);
 	}
 
         private static CaloricLevel caloricLevelGroupFunction(Dish dish) {
