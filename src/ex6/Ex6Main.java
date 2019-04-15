@@ -88,29 +88,13 @@ public class Ex6Main {
 
         Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType =
                 menu.stream().collect(
-                        groupingBy(Dish::getType, mapping(dish -> {
-                                if (dish.getCalories() <= 400) {
-                                        return CaloricLevel.DIET;
-                                } else if (dish.getCalories() <= 700) {
-                                        return CaloricLevel.NORMAL;
-                                } else {
-                                        return CaloricLevel.FAT;
-                                }
-                        },
+                        groupingBy(Dish::getType, mapping(dish -> caloricLevelGroupFunction(dish),
                  toSet())));
         System.out.println(caloricLevelsByType);
 
         Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType2 =
                 menu.stream().collect(
-                        groupingBy(Dish::getType, mapping(dish -> {
-                                if (dish.getCalories() <= 400) {
-                                        return CaloricLevel.DIET;
-                                } else if (dish.getCalories() <= 700) {
-                                        return CaloricLevel.NORMAL;
-                                } else {
-                                        return CaloricLevel.FAT;
-                                }
-                        },
+                        groupingBy(Dish::getType, mapping(dish -> caloricLevelGroupFunction(dish),
                   toCollection(HashSet::new))));
         System.out.println(caloricLevelsByType2);
 	}
