@@ -4,6 +4,7 @@ import static java.util.Comparator.*;
 import static java.util.stream.Collectors.*;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import ex1.Dish;
 
@@ -97,18 +98,64 @@ public class Ex6Main {
                         groupingBy(Dish::getType, mapping(dish -> caloricLevelGroupFunction(dish),
                   toCollection(HashSet::new))));
         System.out.println(caloricLevelsByType2);
+
+        System.out.println("============================ partitioning function ============================");
+        Map<Boolean, List<Dish>> partitionedMenu =
+        		menu.stream().collect(partitioningBy(Dish::isVegetarian));
+        System.out.println(partitionedMenu);
+        List<Dish> vegetarianDishes = partitionedMenu.get(true);
+        System.out.println(vegetarianDishes);
+
+        List<Dish> vegetarianDishes2 = menu.stream().filter(Dish::isVegetarian).collect(toList());
+        System.out.println(vegetarianDishes2);
+
+        Map<Boolean, Map<Dish.Type, List<Dish>>> vegeterianDishesByType =
+        		menu.stream().collect(
+        				partitioningBy(Dish::isVegetarian, groupingBy(Dish::getType)));
+        System.out.println(vegeterianDishesByType);
+
+        Map<Boolean, Dish> mostCaloricPartitionedByVegetarian =
+        		menu.stream().collect(
+        				partitioningBy(Dish::isVegetarian,
+        						collectingAndThen(
+        								maxBy(comparingInt(Dish::getCalories)),
+        								Optional::get)));
+        System.out.println(mostCaloricPartitionedByVegetarian);
+
+        Map<Boolean, Map<Boolean, List<Dish>>> partitioningBy =
+        		menu.stream().collect(partitioningBy(Dish::isVegetarian, partitioningBy(d -> d.getCalories() > 500)));
+        System.out.println(partitioningBy);
+
+        System.out.println("============================ prime ============================");
+        Map<Boolean, List<Integer>> partitionPrimes = partitionPrimes(100);
+        System.out.println(partitionPrimes.get(true));
+
+
+        System.out.println("============================ ToListCollector ============================");
+        List<Dish> dishes = menu.stream().collect(new ToListCollector<>());
+        System.out.println(dishes);
 	}
 
-        private static CaloricLevel caloricLevelGroupFunction(Dish dish) {
-                if (dish.getCalories() <= 400) {
-                        return CaloricLevel.DIET;
-                } else if (dish.getCalories() <= 700) {
-                        return CaloricLevel.NORMAL;
-                } else {
-                        return CaloricLevel.FAT;
-                }
-        }
+	private static boolean isPrime(int candidate) {
+		int candidateRoot = (int) Math.sqrt((double) candidate);
+		return IntStream.rangeClosed(2, candidateRoot).noneMatch(i -> candidate % i == 0);
+	}
 
-        public enum CaloricLevel { DIET, NORMAL, FAT}
+	private static Map<Boolean, List<Integer>> partitionPrimes(int n) {
+		return IntStream.rangeClosed(2, n).boxed()
+						.collect(partitioningBy(candidate -> isPrime(candidate)));
+	}
+
+    private static CaloricLevel caloricLevelGroupFunction(Dish dish) {
+            if (dish.getCalories() <= 400) {
+                    return CaloricLevel.DIET;
+            } else if (dish.getCalories() <= 700) {
+                    return CaloricLevel.NORMAL;
+            } else {
+                    return CaloricLevel.FAT;
+            }
+    }
+
+    public enum CaloricLevel { DIET, NORMAL, FAT}
 }
 
