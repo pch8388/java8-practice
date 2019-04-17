@@ -3,8 +3,12 @@ package ex6;
 import static java.util.Comparator.*;
 import static java.util.stream.Collectors.*;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import ex1.Dish;
@@ -141,7 +145,7 @@ public class Ex6Main {
         System.out.println(partitionPrimesWithCustom.get(true));
     }
 
-    private static Map<Boolean, List<Integer>> partitionPrimesWithCustomCollector(int n) {
+    public static Map<Boolean, List<Integer>> partitionPrimesWithCustomCollector(int n) {
         return IntStream.rangeClosed(2, n).boxed()
                 .collect(new PrimeNumbersCollector());
     }
@@ -151,7 +155,7 @@ public class Ex6Main {
         return IntStream.rangeClosed(2, candidateRoot).noneMatch(i -> candidate % i == 0);
     }
 
-    private static Map<Boolean, List<Integer>> partitionPrimes(int n) {
+    public static Map<Boolean, List<Integer>> partitionPrimes(int n) {
         return IntStream.rangeClosed(2, n).boxed()
             .collect(partitioningBy(candidate -> isPrime(candidate)));
     }
