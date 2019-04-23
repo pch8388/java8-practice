@@ -1,12 +1,14 @@
 package ex11;
 
+import static java.util.stream.Collectors.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Stream;
 
 public class BestPriceFinder {
     private final List<Shop> shops = Arrays.asList(new Shop("BestPrice"),
@@ -52,5 +54,32 @@ public class BestPriceFinder {
     	return priceFutures.stream()
     					    .map(CompletableFuture::join)
     					    .collect(toList());
+    }
+
+    public List<String> findPricesInUSD(String product) {
+    	List<CompletableFuture<Double>> priceFutures = new ArrayList<>();
+    	for(Shop shop : shops) {
+    		CompletableFuture<Double> futurePriceInUSD =
+    				CompletableFuture.supplyAsync(() -> shop.calculatePrice(product))
+    				.thenCombine(CompletableFuture.supplyAsync(
+    						() -> ExchangeService.getRate(ExchangeService.Money.EUR, ExchangeService.Money.USD)),
+    						(price, rate) -> price * rate);
+
+    		priceFutures.add(futurePriceInUSD);
+    	}
+		return priceFutures.stream()
+							.map(CompletableFuture::join)
+							.map(price -> " price is " + price)
+							.collect(toList());
+    }
+
+    public Stream<CompletableFuture<String>> findPricesStream(String product) {
+    	return shops.stream()
+    				.map(shop -> CompletableFuture.supplyAsync(
+    									() -> shop.getPrice(product), executor))
+    				.map(future -> future.thenApply(Quote::parse))
+    				.map(future -> future.thenCompose(quote ->
+    									CompletableFuture.supplyAsync(
+    											() -> Discount.applyDisCount(quote), executor)));
     }
 }
